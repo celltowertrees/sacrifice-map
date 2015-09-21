@@ -1,4 +1,5 @@
 var http = require('http'),
+    express = require('express'),
     jsdom = require('jsdom'),
     
     // packages
@@ -11,7 +12,7 @@ var http = require('http'),
 
 // =================================================== create artificial DOM
 
-var htmlStub = '<html><head><title>lol</title></head><body><div id="container"></div><script src="node_modules/d3/d3.min.js"></script></body></html>',
+var htmlStub = '<html><head><title>lol</title></head><body><div id="container"></div></body><script src="/assets/js/d3.min.js"></script></html>',
     result;
 
 jsdom.env({
@@ -20,6 +21,7 @@ jsdom.env({
     },
     html: htmlStub,
     done: function (errors, window) {
+
         // im sure i decided to run this from the server for good reason.
         // d3 wants the DOM to be available. so we are simulating a client-side env.
         var zone = window.document.querySelector('#container');
@@ -39,14 +41,18 @@ jsdom.env({
 
 // =================================================== start server
 
-var PORT = 8080;
+var PORT = 8080,
+    app = express(),
+    server = http.createServer(app);
 
-var handleRequest = function (request, response) {
-        response.end(result);
-    };
 
-var server = http.createServer(handleRequest);
+app.use('/assets', express.static('assets'));
 
 server.listen(PORT, function () {
     console.log('Server listening on: http://localhost:%s', PORT);
+});
+
+app.get('/', function (request, response) {
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.end(result);
 });
