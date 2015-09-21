@@ -7,11 +7,7 @@ var http = require('http'),
     
     // data
     animals = require('./animals.json'),
-    nyc = require('./nycboroughboundaries.geojson');
-
-// =================================================== convert stuff
-
-var topology = topojson.topology({collection: nyc[0]});
+    nyc = require('./nyc.json');
 
 // =================================================== create artificial DOM
 
@@ -26,23 +22,20 @@ jsdom.env({
     done: function (errors, window) {
         // im sure i decided to run this from the server for good reason.
         // d3 wants the DOM to be available. so we are simulating a client-side env.
-        zone = window.document.querySelector('#container');
-        d3.select(zone).append('svg')
+        var zone = window.document.querySelector('#container');
+
+        var svg = d3.select(zone).append('svg')
             .attr('width', 960)
             .attr('height', 1160);
-        
+
+        svg.append('path')
+            .datum(topojson.feature(nyc, nyc.objects.nycboroughboundaries))
+            .attr('d', d3.geo.path().projection(d3.geo.mercator()));
 
         // convert to string
-        result = window.document.querySelector('body').innerHTML;
+        result = window.document.querySelector('html').innerHTML;
     }
 });
-
-// =================================================== draw
-
-//svg.append('path')
-//    .datum(topojson.feature(topology, topology.objects.subunits))
-//    .attr('d', d3.geo.path().projection(d3.geo.mercator()));
-
 
 // =================================================== start server
 
