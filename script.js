@@ -12,7 +12,8 @@ var http = require('http'),
 
 // =================================================== create artificial DOM
 
-var htmlStub = '<html><head><title>lol</title></head><body><div id="container"></div></body><script src="/assets/js/d3.min.js"></script></html>',
+// TODO: import html stub from another file
+var htmlStub = '<html><head><link href="assets/style.css" rel="stylesheet" /><title>lol</title></head><body><div id="container"></div></body><script src="/assets/js/d3.min.js"></script></html>',
     result;
 
 jsdom.env({
@@ -21,18 +22,29 @@ jsdom.env({
     },
     html: htmlStub,
     done: function (errors, window) {
+        var width = 1000,
+            height = 800,
+            data = topojson.feature(nyc, nyc.objects.nycboroughboundaries),
+            center = d3.geo.centroid(data),
+            offset = [width / 2, height / 2],
+            proj = d3.geo.mercator()
+                .scale(70000)
+                .center(center)
+                .translate(offset),
+            path = d3.geo.path().projection(proj);
 
         // im sure i decided to run this from the server for good reason.
         // d3 wants the DOM to be available. so we are simulating a client-side env.
         var zone = window.document.querySelector('#container');
 
         var svg = d3.select(zone).append('svg')
-            .attr('width', 960)
-            .attr('height', 1160);
+            .attr('width', width)
+            .attr('height', height);
 
         svg.append('path')
-            .datum(topojson.feature(nyc, nyc.objects.nycboroughboundaries))
-            .attr('d', d3.geo.path().projection(d3.geo.mercator()));
+            .datum(data)
+            .attr('d', path)
+            .attr('class', 'path');
 
         // convert to string
         result = window.document.querySelector('html').innerHTML;
