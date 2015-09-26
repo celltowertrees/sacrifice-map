@@ -1,10 +1,9 @@
 var http = require('http'),
     express = require('express'),
     jsdom = require('jsdom'),
-    
-    // packages
     d3 = require('d3'),
     topojson = require('topojson'),
+    fs = require('fs'),
     
     // data
     animals = require('./animals.json'),
@@ -45,6 +44,17 @@ jsdom.env({
             .datum(data)
             .attr('d', path)
             .attr('class', 'path');
+
+        for (i in animals) {
+            // lol nah
+            svg.append('circle')
+                .data([animals[i]])
+                .attr('transform', function (d) {
+                    return "translate(" + proj([d.lng, d.lat]) + ")";
+                })
+                .attr('r', 1)
+                .attr('class', 'point');
+        }
 
         // convert to string
         result = window.document.querySelector('html').innerHTML;

@@ -1,5 +1,9 @@
 .path {
-	fill: none;
-	stroke: black;
-	stroke-width: 1pt;
+	fill: #cfcfcf;
+	stroke: #fff;
+	stroke-width: 1px;
+}
+
+.point {
+	fill: #dd0000;
 }
