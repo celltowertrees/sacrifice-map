@@ -45,6 +45,12 @@ jsdom.env({
             .attr('d', path)
             .attr('class', 'path');
 
+        svg.selectAll('.schooldistrict')
+            .data(topojson.feature(nyc, nyc.objects.schooldistricts).features)
+            .enter().append('path')
+            .attr('d', path)
+            .attr('class', 'district');
+
         //
         // add the data points
         //

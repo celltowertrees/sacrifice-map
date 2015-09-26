@@ -1,9 +1,11 @@
 .path {
-	fill: #cfcfcf;
-	stroke: #fff;
-	stroke-width: 1px;
+	fill: none;
 }
 
 .point {
-	fill: #dd0000;
+	fill: #990000;
+}
+
+.district {
+	fill: #cfcfcf;
 }
