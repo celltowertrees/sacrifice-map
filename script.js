@@ -3,27 +3,24 @@ var http = require('http'),
     jsdom = require('jsdom'),
     d3 = require('d3'),
     topojson = require('topojson'),
-    fs = require('fs'),
     
     // data
     animals = require('./animals.json'),
-    nyc = require('./nyc.json');
+    nyc = require('./districts.json');
 
 // =================================================== create artificial DOM
 
-// TODO: import html stub from another file
-var htmlStub = '<html><head><link href="assets/style.css" rel="stylesheet" /><title>lol</title></head><body><div id="container"></div></body><script src="/assets/js/d3.min.js"></script></html>',
-    result;
+var result;
 
 jsdom.env({
     features: {
         QuerySelector: true
     },
-    html: htmlStub,
+    file: 'stub.html',
     done: function (errors, window) {
         var width = 1000,
             height = 800,
-            data = topojson.feature(nyc, nyc.objects.nycboroughboundaries),
+            data = topojson.feature(nyc, nyc.objects.schooldistricts),
             center = d3.geo.centroid(data),
             offset = [width / 2, height / 2],
             proj = d3.geo.mercator()
@@ -40,13 +37,18 @@ jsdom.env({
             .attr('width', width)
             .attr('height', height);
 
+        //
+        // geographic path
+        //
         svg.append('path')
             .datum(data)
             .attr('d', path)
             .attr('class', 'path');
 
+        //
+        // add the data points
+        //
         for (i in animals) {
-            // lol nah
             svg.append('circle')
                 .data([animals[i]])
                 .attr('transform', function (d) {
@@ -56,7 +58,9 @@ jsdom.env({
                 .attr('class', 'point');
         }
 
-        // convert to string
+        //
+        // now it's all converted to a string and prepared to be Served
+        //
         result = window.document.querySelector('html').innerHTML;
     }
 });
